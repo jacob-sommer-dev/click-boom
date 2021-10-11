@@ -35,7 +35,7 @@
                     <TextBlock Text=" x "/>
                     <TextBox Name="CustomSizeYTB" IsEnabled="False" Width="24" AcceptsReturn="False" MaxLength="2" TextChanged="CustomSizeTB_TextChanged" Text="{Binding FieldY}"></TextBox>
                 </StackPanel>
-                <TextBlock Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2" FontSize="11" Foreground="Gray" TextWrapping="WrapWithOverflow" TextAlignment="Center" Text="Custom values will be clamped between 6 and 48"/>
+                <TextBlock Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2" FontSize="11" Foreground="Gray" TextWrapping="WrapWithOverflow" TextAlignment="Center" Text="Custom values will be clamped between 8 and 48"/>
             </Grid>
         </Border>
 

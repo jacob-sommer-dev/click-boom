@@ -21,7 +21,9 @@ namespace ClickBoom
     public partial class MainWindow : Window
     {
         public static readonly int FIELD_DIMEN_MAX = 48;
-        public static readonly int FIELD_DIMEN_MIN = 6;
+        public static readonly int FIELD_DIMEN_MIN = 8;
+
+        public Controls.ClickBoomField PlayingField { get; private set; }
 
         public Views.OptionWindow OptionWindow { get; private set; }
 
@@ -30,6 +32,10 @@ namespace ClickBoom
             this.Initialized += MainWindow_Initialized;
 
             this.Closing += MainWindow_Closing;
+
+            PlayingField = new Controls.ClickBoomField();
+
+            DataContext = this;
 
             InitializeComponent();
 
@@ -43,6 +49,8 @@ namespace ClickBoom
         private void MainWindow_Initialized(object sender, EventArgs e)
         {
             this.Hide();
+
+            PlayingFieldScroller.Content = PlayingField;
 
             OptionWindow = new Views.OptionWindow(MainWindow_Closing, GoButton_Click);
             OptionWindow.Show();
@@ -64,10 +72,17 @@ namespace ClickBoom
             PlayingField.Setup(x, y);
 
             // extra padding for window width/height
-            Width = PlayingField.Width + 42;
-            Height = PlayingField.Height + 42;
+            Width = Math.Min(PlayingField.Width + 42, 640);
+            Height = Math.Min(PlayingField.Height + 82, 480);
 
             this.Show();
+
+            PlayingField.Start();
+        }
+
+        private void ResetButton_Click(object sender, RoutedEventArgs e)
+        {
+            PlayingField.Reset();
         }
     }
 }

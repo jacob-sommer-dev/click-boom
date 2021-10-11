@@ -21,7 +21,7 @@ namespace ClickBoom.Views
     public partial class OptionWindow : Window
     {
         // regex for one or two digits exclusively
-        private static readonly Regex onlyDigitsRegex = new Regex("\\b\\d{1,2}\\b");
+        private static readonly Regex onlyDigitsRegex = new Regex("^\\d{1,2}\\z");
 
         private RoutedEventHandler mainGoHandler;
         private System.ComponentModel.CancelEventHandler mainCancelHandler;

@@ -7,9 +7,28 @@
         xmlns:localControls="clr-namespace:ClickBoom.Controls"
         mc:Ignorable="d"
         Title="ClickBoom" Height="480" Width="480">
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-        <localControls:ClickBoomField x:Name="PlayingField">
+    <StackPanel Orientation="Vertical" Margin="2">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Grid.Row="0" TextAlignment="Center" Text="Booms Remaining"/>
+            <TextBlock Grid.Column="0" Grid.Row="1" TextAlignment="Center" Text="{Binding Path=PlayingField.BoomsRemaining, Mode=OneWay}"/>
+            <Button Name="ResetButton" Grid.Column="1" Grid.Row="1" Content="Reset" Click="ResetButton_Click"/>
+            <TextBlock Grid.Column="2" Grid.Row="0" TextAlignment="Center" Text="Timer"/>
+            <TextBlock Grid.Column="2" Grid.Row="1" TextAlignment="Center" Text="{Binding Path=PlayingField.Time, Mode=OneWay}"/>
 
-        </localControls:ClickBoomField>
-    </ScrollViewer>
+        </Grid>
+
+        <ScrollViewer Name="PlayingFieldScroller" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+            
+        </ScrollViewer>
+    </StackPanel>
+    
 </Window>
