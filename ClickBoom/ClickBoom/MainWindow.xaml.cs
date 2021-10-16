@@ -29,9 +29,11 @@ namespace ClickBoom
 
         public MainWindow()
         {
-            this.Initialized += MainWindow_Initialized;
+            Initialized += MainWindow_Initialized;
 
-            this.Closing += MainWindow_Closing;
+            Closing += MainWindow_Closing;
+
+            SizeChanged += MainWindow_SizeChanged;
 
             PlayingField = new Controls.ClickBoomField();
 
@@ -39,6 +41,12 @@ namespace ClickBoom
 
             InitializeComponent();
 
+        }
+
+        private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            PlayingFieldScroller.Width = e.NewSize.Width - 32;
+            PlayingFieldScroller.Height = e.NewSize.Height - 82;
         }
 
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)

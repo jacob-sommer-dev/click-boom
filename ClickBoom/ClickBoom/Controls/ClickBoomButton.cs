@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace ClickBoom.Controls
 {
@@ -36,6 +37,12 @@ namespace ClickBoom.Controls
             state = State.REVEALED;
 
             Refresh();
+
+            // if the player clicked this one, highlight it red
+            if(Contents == -1)
+            {
+                Background = Brushes.Red;
+            }
         }
 
         private void Refresh()

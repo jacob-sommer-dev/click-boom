@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
@@ -11,10 +13,9 @@ namespace ClickBoom.Controls
 {
     public class ClickBoomField : Grid, System.ComponentModel.INotifyPropertyChanged
     {
-
         private int x, y = 0;
 
-        private int[,] _field;
+        private int[][] _field;
 
         private int _booms = 0;
         private int _flagsPlaced = 0;
@@ -62,6 +63,12 @@ namespace ClickBoom.Controls
         /// <param name="y">number of rows</param>
         public void Setup(int x, int y)
         {
+            this.Children.Clear();
+
+            // we need more random than Random
+            // otherwise it might get stuck trying the same spots over and over
+            RNGCryptoServiceProvider random = new RNGCryptoServiceProvider();
+
             this.x = x;
             this.y = y;
 
@@ -105,32 +112,57 @@ namespace ClickBoom.Controls
             // if diff is 0, we're done
 
             // generate a [x][y] field, scattering ~.2 of total spaces-worth of booms
-            _field = new int[x, y];
+            _field = new int[x][];
+            for(int i = 0; i < x; i++)
+            {
+                _field[i] = new int[y];
+            }
+
+            //printGrid("initial grid");
+
+            // pre-weight spots next to boundaries to "have adjacent booms" so we don't put booms in invalid spots
+            setBoundaryWeights(false);
+
+            //printGrid("add preweights");
 
             int boomsToPlace = _booms;
-            Random rand = new Random();
+            byte[] bytes = new byte[2];
 
-            // TODO: SLOOOOWWWW. Figure out a better way
             while (boomsToPlace > 0)
             {
-                int rx = rand.Next(0, x);
-                int ry = rand.Next(0, y);
+                random.GetBytes(bytes);
 
-                if (validBoomSpot(rx, ry)) // don't completely surround
+                // clamp the randoms between 0 and our field lengths
+                float frx = Math.Abs(bytes[0]) * (((float)x - 1) / byte.MaxValue);
+                float fry = Math.Abs(bytes[1]) * (((float)y - 1) / byte.MaxValue);
+
+                int rx = frx - (int)frx >= 0.5f ? (int)frx + 1 : (int)frx;
+                int ry = fry - (int)fry >= 0.5f ? (int)fry + 1 : (int)fry;
+
+
+                Debug.WriteLine("Trying [" + rx + "][" + ry + "]");
+
+                if (validBoomSpot(rx, ry)) // if it's a valid spot
                 {
-                    _field[rx, ry] = -1; // -1 is a boom
+                    _field[rx][ry] = -1; // -1 is now a boom
+                    incrementAdjacent(rx, ry);// increment adjacent spots
                     boomsToPlace--;
+
+                    //printGrid("boom at [" + rx + "][" + ry + "]");
                 }
             }
 
-            // now count the adjacent booms and add a ClickBoomButton for each spot on the field
+            // booms are now placed, so we can remove the pre-weights
+            setBoundaryWeights(true);
+
+            //printGrid("remove preweights");
+
+            // now add a ClickBoomButton for each spot on the field
             for (int i = 0; i < x; i++)
             {
-                for(int j = 0; j < y; j++)
+                for (int j = 0; j < y; j++)
                 {
-                    _field[i, j] = _field[i, j] == -1 ? -1 : countAdjacentBooms(i, j);
-
-                    ClickBoomButton cbb = new ClickBoomButton(_field[i, j]);
+                    ClickBoomButton cbb = new ClickBoomButton(_field[i][j]);
                     Grid.SetColumn(cbb, i);
                     Grid.SetRow(cbb, j);
                     cbb.Click += ClickBoomButton_Click;
@@ -138,17 +170,79 @@ namespace ClickBoom.Controls
                 }
             }
 
-
+            random.Dispose();
         }
 
         private void ClickBoomButton_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             ClickBoomButton cbb = (ClickBoomButton)sender;
 
+            // TODO reveal the spot
+
+            // TODO if it was a boom, end the game
             if(cbb.Contents == -1)
             {
 
             }
+        }
+
+        private void setBoundaryWeights(bool decrement)
+        {
+            
+            if(decrement) // have to be careful not to decrement booms (-1)
+            {
+                // first, do the corners, weighted at 5.
+                // TODO determine if Math.Max or ifs are faster
+                
+                //_field[0][0] = Math.Max(-1, _field[0][0] - 5);
+                //_field[0][_field[0].Length - 1] = Math.Max(-1, _field[0][_field[0].Length - 1] - 5);
+                //_field[_field.Length - 1][0] = Math.Max(-1, _field[_field.Length - 1][0] - 5);
+                //_field[_field.Length - 1][_field[0].Length - 1] = Math.Max(-1, _field[_field.Length - 1][_field[0].Length - 1] - 5);
+
+                if (_field[0][0] != -1) { _field[0][0] -= 5; }
+                if (_field[0][_field[0].Length - 1] != -1) { _field[0][_field[0].Length - 1] -= 5; }
+                if (_field[_field.Length - 1][0] != -1) { _field[_field.Length - 1][0] -= 5; }
+                if (_field[_field.Length - 1][_field[0].Length - 1] != -1) { _field[_field.Length - 1][_field[0].Length - 1] -= 5; }
+
+                // now do the rest of the boundary spots, weighted at 3
+                for (int i = 1; i < _field.Length - 1; i++)
+                {
+                    // column starts and ends
+                    if (_field[i][0] != -1) { _field[i][0] -= 3; }
+                    if (_field[i][_field[0].Length - 1] != -1) { _field[i][_field[0].Length - 1] -= 3; }
+                }
+
+                for (int j = 1; j < _field[0].Length - 1; j++)
+                {
+                    // row starts and ends
+                    if (_field[0][j] != -1) { _field[0][j] -= 3; }
+                    if (_field[_field.Length - 1][j] != -1) { _field[_field.Length - 1][j] -= 3; }
+                }
+
+            }
+            else // initial increment, just do it
+            {
+                // first, do the corners, weighted at 5
+                _field[0][0]
+                    = _field[0][_field[0].Length - 1]
+                    = _field[_field.Length - 1][0]
+                    = _field[_field.Length - 1][_field[0].Length - 1]
+                    = 5;
+
+                // now do the rest of the boundary spots, weighted at 3
+                for (int i = 1; i < _field.Length - 1; i++)
+                {
+                    // column starts and ends
+                    _field[i][0] = _field[i][_field[0].Length - 1] = 3;
+                }
+
+                for (int j = 1; j < _field[0].Length - 1; j++)
+                {
+                    // row starts and ends
+                    _field[0][j] = _field[_field.Length - 1][j] = 3;
+                }
+            }
+            
         }
 
         /// <summary>
@@ -163,71 +257,48 @@ namespace ClickBoom.Controls
         /// <returns>bool true if valid place for a boom</returns>
         private bool validBoomSpot(int x, int y)
         {
-            return _field[x, y] != -1
-                && countAdjacentBooms(x - 1, y - 1, true) < 7
-                && countAdjacentBooms(x, y - 1, true) < 7
-                && countAdjacentBooms(x + 1, y - 1, true) < 7
-                && countAdjacentBooms(x - 1, y, true) < 7
-                && countAdjacentBooms(x, y, true) < 7
-                && countAdjacentBooms(x + 1, y, true) < 7
-                && countAdjacentBooms(x - 1, y + 1, true) < 7
-                && countAdjacentBooms(x, y + 1, true) < 7
-                && countAdjacentBooms(x + 1, y + 1, true) < 7;
-        }
-
-        /// <summary>
-        /// Counts the number of booms adjacent to the space at x,y 
-        /// </summary>
-        /// <param name="x">column of space to check</param>
-        /// <param name="y">row of space to check</param>
-        /// <param name="countBoundaries">default: false. Count boundaries as bombs, useful for generation algorithm</param>
-        /// <returns>int number of booms (and boundary spots) to the current spot</returns>
-        private int countAdjacentBooms(int x, int y, bool countBoundaries = false)
-        {
-            int adjacent = 0;
-
-            for (int i = -1; i < 2; i++)
+            for (int i = -2; i < 3; i++)
             {
-                for (int j = -1; j < 2; j++)
+                for (int j = -2; j < 3; j++)
                 {
-                    try
-                    {
-                        int val = _field[x + i, y + j]; // IndexOutOfRange should short circuit here if needed
+                    int fx = x + i;
+                    int fy = y + j;
 
-                        if (val == -1)
-                        {
-                            adjacent++;
-                        }
-                    }
-                    catch (IndexOutOfRangeException e)
+                    if (!(fx < 0 || fx >= _field.Length || fy < 0 || fy >= _field[0].Length))
                     {
-                        // don't do anything unless we're counting boundaries
-                        if (countBoundaries)
+                        int val = _field[x + i][y + j];
+
+                        if ((fx == x && fy == y && val < 0) || val > 6)
                         {
-                            adjacent++;
+                            return false;
                         }
                     }
                 }
             }
-            
 
-            //// if it's in a corner, increment by 5
-            //if ((x == 0 && y == 0) 
-            //    || (x == 0 && y == this.y)
-            //    || (x == this.x && y == 0)
-            //    || (x == this.x && y == this.y)
-            //    )
-            //{
-            //    adjacent += 5;
-            //}
-            //// it's not in a corner, but it's along a side, increment by 3
-            //else if (x == 0 || x == this.x || y == 0 || y == this.y)
-            //{
-            //    adjacent += 3;
-            //}
+            return true;
+        }
 
+        private void incrementAdjacent(int x, int y)
+        {
+            for (int i = -1; i < 2; i++)
+            {
+                for (int j = -1; j < 2; j++)
+                {
+                    int fx = x + i;
+                    int fy = y + j;
 
-            return adjacent;
+                    if (fx >= 0
+                        && fx < _field.Length
+                        && fy >= 0
+                        && fy < _field[0].Length
+                        && _field[x + i][y + j] > -1 // don't increment if it's a boom
+                        )
+                    {
+                        _field[x + i][y + j]++;
+                    }
+                }
+            }
         }
 
         public void Reset()
@@ -239,6 +310,21 @@ namespace ClickBoom.Controls
         public void Start()
         {
             timer.Start();
+        }
+
+        // useful for debugging
+        public void printGrid(string additional = "")
+        {
+            Debug.WriteLine("//// GRID: " + additional + " ////");
+            for (int j = 0; j < _field[0].Length; j++)
+            {
+                for (int i = 0; i < _field.Length; i++)
+                {
+                    Debug.Write("[" + _field[i][j] + "]");
+                }
+                Debug.WriteLine("");
+            }
+            Debug.WriteLine("////////////////////////");
         }
     }
 }
