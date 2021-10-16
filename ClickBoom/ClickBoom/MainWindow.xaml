@@ -6,29 +6,41 @@
         xmlns:local="clr-namespace:ClickBoom"
         xmlns:localControls="clr-namespace:ClickBoom.Controls"
         mc:Ignorable="d"
-        Title="ClickBoom" Height="480" Width="480">
-    <StackPanel Orientation="Vertical" Margin="2">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition/>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" Grid.Row="0" TextAlignment="Center" Text="Booms Remaining"/>
-            <TextBlock Grid.Column="0" Grid.Row="1" TextAlignment="Center" Text="{Binding Path=PlayingField.BoomsRemaining, Mode=OneWay}"/>
-            <Button Name="ResetButton" Grid.Column="1" Grid.Row="1" Content="Reset" Click="ResetButton_Click"/>
-            <TextBlock Grid.Column="2" Grid.Row="0" TextAlignment="Center" Text="Timer"/>
-            <TextBlock Grid.Column="2" Grid.Row="1" TextAlignment="Center" Text="{Binding Path=PlayingField.Time, Mode=OneWay}"/>
+        Title="ClickBoom" Height="480" Width="480" MinHeight="220" MinWidth="350">
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="_New" Click="NewButton_Click"/>
+                <MenuItem Header="_Reset" Click="ResetButton_Click"/>
+                <Separator/>
+                <MenuItem Header="_Exit" Click="ExitButton_Click"/>
+            </MenuItem>
+        </Menu>
+        <StackPanel Orientation="Vertical" Margin="2">
+            <Grid Height="50">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Grid.Row="0" TextAlignment="Center" Text="Booms Remaining"/>
+                <TextBlock Grid.Column="0" Grid.Row="1" TextAlignment="Center" Text="{Binding Path=PlayingField.BoomsRemaining, Mode=OneWay}"/>
+                <StackPanel Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" Orientation="Horizontal">
+                    <Button Name="ResetButton" Content="Reset" Margin="0,2,5,2" MinWidth="50" Click="ResetButton_Click"/>
+                    <Button Name="NewButton" Content="New" Margin="5,2,0,2" MinWidth="50" Click="NewButton_Click"/>
+                </StackPanel>
+                <TextBlock Grid.Column="2" Grid.Row="0" TextAlignment="Center" Text="Timer"/>
+                <TextBlock Grid.Column="2" Grid.Row="1" TextAlignment="Center" Text="{Binding Path=PlayingField.Time, Mode=OneWay}"/>
 
-        </Grid>
+            </Grid>
 
-        <ScrollViewer Name="PlayingFieldScroller" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-            
-        </ScrollViewer>
-    </StackPanel>
-    
+            <ScrollViewer Name="PlayingFieldScroller" Margin="2,5,2,2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+
+            </ScrollViewer>
+        </StackPanel>
+    </DockPanel>
 </Window>

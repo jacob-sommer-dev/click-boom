@@ -12,11 +12,12 @@ Progress:
 5. Reset button generates a new field with the current size
 6. Timer counts seconds from start time, resets when game is reset
 7. Counter for traps in play
+8. DONE Placement algorithm is *slow* - speed it up
+9. DONE All spots are revealed immediately (to check placement algorithm). Make them hidden by default
+10. DONE Add left and right click handlers to the buttons (left = reveal spot, right = flag or ? spot)
+11. DONE Flagged spots should decrement trap counter
+12. Done Add game end state. When all non-trap spots are revealed, stop the timer, display a message to the user with their time. Allow restart/new game
 
 TO-DOs
-1. Placement algorithm is *slow* - speed it up
-2. Timer (or update binding) is *inconsistent* - determine issue and fix
-3. All spots are revealed immediately (to check placement algorithm). Make them hidden by default
-4. Add left and right click handlers to the buttons (left = reveal spot, right = flag or ? spot)
-5. Flagged spots should decrement trap counter
-6. Add game end state. When all non-trap spots are revealed, stop the timer, display a message to the user with their time. Allow restart/new game
+1. Timer (or update binding) is inconsistent - determine issue and fix
+2. Clean up and add additional comments

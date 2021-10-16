@@ -1,0 +1,24 @@
+﻿<Window x:Class="ClickBoom.Views.ResultsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ClickBoom.Views"
+        mc:Ignorable="d"
+        Title="ClickBoom - Results" Height="220" Width="250" MinHeight="220" MinWidth="250">
+    <Grid Margin="5">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <TextBlock Name="ResultsHeaderTB" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" TextWrapping="WrapWithOverflow" TextAlignment="Center" Text="Text"/>
+        <TextBlock Name="ResultsBodyTB" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" TextWrapping="WrapWithOverflow" TextAlignment="Center" Text="Text"/>
+        <Button Name="ResultsResetButton" Height="30" Width="90" Grid.Column="0" Grid.Row="2" Content="Reset" ToolTip="Reset the game with the current board size" Click="ResultsResetButton_Click"/>
+        <Button Name="ResultsNewButton" Height="30" Width="90" Grid.Column="1" Grid.Row="2" Content="New" ToolTip="Choose a new board size and start a new game" Click="ResultsNewButton_Click"/>
+    </Grid>
+</Window>

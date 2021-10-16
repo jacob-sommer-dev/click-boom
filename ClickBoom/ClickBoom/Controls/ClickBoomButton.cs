@@ -21,7 +21,20 @@ namespace ClickBoom.Controls
     {
 
         public int Contents { get; set; } = 0;
-        public State state { get; private set; } = State.REVEALED;
+
+        private State _state = State.BLANK;
+        public State State 
+        {
+            get 
+            {
+                return _state;
+            }
+            set 
+            {
+                _state = value;
+                Refresh();
+            } 
+        }
 
         public ClickBoomButton(int content)
         {
@@ -30,24 +43,31 @@ namespace ClickBoom.Controls
             Refresh();
         }
 
-        protected override void OnClick()
+        public void OnRightClick()
         {
-            base.OnClick();
-
-            state = State.REVEALED;
-
-            Refresh();
-
-            // if the player clicked this one, highlight it red
-            if(Contents == -1)
+            switch (State)
             {
-                Background = Brushes.Red;
+                case State.BLANK:
+                    State = State.FLAGGED;
+                    (Parent as ClickBoomField).FlagsPlaced++;
+                    break;
+                case State.FLAGGED:
+                    State = State.QUESTIONED;
+                    (Parent as ClickBoomField).FlagsPlaced--;
+                    break;
+                case State.QUESTIONED:
+                    State = State.BLANK;
+                    break;
+                case State.REVEALED:
+                default:
+                    // don't do anything
+                    break;
             }
         }
 
         private void Refresh()
         {
-            switch (state)
+            switch (State)
             {
                 case State.QUESTIONED:
                     Content = "?";
@@ -56,7 +76,17 @@ namespace ClickBoom.Controls
                     Content = "F";
                     break;
                 case State.REVEALED:
-                    Content = (Contents == -1) ? "☼" : (Contents == 0) ? " " : ""+Contents;
+                    
+                    if(Contents == -1)
+                    {
+                        Content = "☼";
+                        Background = Brushes.LightPink;
+                    }
+                    else
+                    {
+                        Content = (Contents == 0) ? " " : string.Format("{0}", Contents);
+                        Background = Brushes.LightCyan;
+                    }
                     break;
                 case State.BLANK:
                 default:
