@@ -7,7 +7,7 @@ Progress:
 2. Options window passes *close* and *start* button events to main (playing field) window
 3. Pseudo-random trap placement algorithm that respects trap placement rules
     - Don't surround a spot with traps
-    - Place a certain number of traps, determined by a ratio of the total number of spots (currently .2)
+    - Place a certain number of traps, determined by a ratio of the total number of spots (currently .15)
 4. Playing field is displayed, spots represented by buttons
 5. Reset button generates a new field with the current size
 6. Timer counts seconds from start time, resets when game is reset
