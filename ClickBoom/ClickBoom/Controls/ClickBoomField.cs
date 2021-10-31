@@ -89,6 +89,7 @@ namespace ClickBoom.Controls
             this.y = y;
 
             _booms = (int)(x * y * .15);
+            _flagsPlaced = 0;
             BoomsRemaining = _booms;
 
             timer.Stop();
